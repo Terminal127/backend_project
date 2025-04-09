@@ -1,61 +1,277 @@
-# Online Book Store API
+# BookStore API
 
-Book store API made using Node.js, Express.js, and MongoDB
+## Table of Contents
 
-### API Features:
+- [Description](#description)
+- [Features](#features)
+- [Technologies](#technologies)
+- [Setup Instructions](#setup-instructions)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [License](#license)
 
-1. **Books**
-   - Show a list of books to buy
-   - In book list, only show books which are in stock
-   - Show individual book details
-2. **Purchase**
-   - Books can be purchased only by logged in user
-   - Purchase is allowed only if the book is in stock
-   - Book's stock decrease/increase based on how many purchases have been made or canceled respectively
-   - Users can see their respective purchase list or individual purchase
-   - User can cancel their purchase (or order)
-3. **User**
-   - User signup / login feature available
-   - User has 2 roles
-     - Normal user
-     - Admin user
-   - A normal user can signup by _Name_, _Email_ and _Password_
-   - For login, _Email_ and _Password_ is required
-   - To register/signup as an **ADMIN**, an extra **admin-signup-key** is required which is not public
-   - Authentication is done by JWT tokens
-   - A normal user can see and purchase books but he/she can not add/modify a book
-   - A norma user can also cancel a purchase
-4. **Admin features**
-   - Only Admin can add/delete a book
-   - Admin can increase or decrease a book's stock
-   - Admin can update a book's data, such as title, description
+## Description
 
-### Guide to local setup
+BookStore API is a RESTful web service for managing books and users in a bookstore. It allows users to register, login, and perform CRUD operations on books. The API also supports role-based access control, where only admin users can add, update, or delete books.
 
-1. Clone this repository
+## Features
+
+- User registration and authentication
+- Role-based access control (admin and normal users)
+- CRUD operations for books
+- Swagger/OpenAPI documentation
+- Unit and integration tests
+
+## Technologies
+
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT (JSON Web Tokens)
+- bcrypt.js
+- Swagger
+- Mocha
+- Chai
+- Chai-HTTP
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js (v12 or higher)
+- MongoDB
+
+### Installation
+
+1. Clone the repository:
+
    ```bash
-   git clone https://github.com/akashgiricse/BookStore.git
+   git clone https://github.com/yourusername/bookstore.git
+   cd bookstore
    ```
-2. Install node packages (from root directory)
+
+2. Install dependencies:
+
    ```bash
    npm install
    ```
-3. Setup a database on [MongoDB cloud database](https://www.mongodb.com/cloud) and get a _"Connection String"_
-4. Add the _"Connection String"_ to **mongoURI** key in `default.json` file which is in `config` folder
-5. Add **"jwtSecret"** and **"admin-signup-key"** key's value of your choice in `default.json`
-6. Run development server
-   ```bash
-   npm run server
+
+3. Set up environment variables:
+
+   Create a `default.json` file in the `config` directory with the following content:
+
+   ```json
+   {
+     "mongoURI": "your_mongodb_connection_string",
+     "jwtSecret": "your_jwt_secret",
+     "admin-signup-key": "your_admin_signup_key"
+   }
    ```
-7. Use the API in Postman or any other API testing tool
 
-### Please refere [here](https://github.com/akashgiricse/BookStore/blob/master/APIDoc.md) for API documentation
+4. Start the server:
 
-### Contributors
+   ```bash
+   npm start
+   ```
 
-- [Akash Giri](https://github.com/akashgiricse)
+   The server will start on `http://localhost:3000`.
 
-### License
+### API Documentation
 
-MIT License <br>
-Copyright (c) 2019 Akash Giri.
+The API documentation is available at `http://localhost:3000/api-docs`.
+
+## API Documentation
+
+### User Routes
+
+#### Register a User
+
+- **URL:** `/api/users/register`
+- **Method:** `POST`
+- **Request Body:**
+
+  ```json
+  {
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "password": "password1234"
+  }
+  ```
+
+- **Response:**
+
+  ```json
+  {
+    "token": "jwt_token"
+  }
+  ```
+
+#### Login a User
+
+- **URL:** `/api/users/login`
+- **Method:** `POST`
+- **Request Body:**
+
+  ```json
+  {
+    "email": "john.doe@example.com",
+    "password": "password1234"
+  }
+  ```
+
+- **Response:**
+
+  ```json
+  {
+    "token": "jwt_token"
+  }
+  ```
+
+### Book Routes
+
+#### Get All Books
+
+- **URL:** `/api/books`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `category` (optional)
+  - `author` (optional)
+  - `rating` (optional)
+  - `page` (optional, default: 1)
+  - `limit` (optional, default: 10)
+
+- **Response:**
+
+  ```json
+  {
+    "books": [
+      {
+        "title": "Malgudi Days",
+        "description": "A collection of short stories",
+        "price": 500,
+        "stock": 100,
+        "category": "Fiction",
+        "author": "R.K. Narayan",
+        "rating": 4.5
+      }
+    ],
+    "totalPages": 1,
+    "currentPage": 1
+  }
+  ```
+
+#### Get a Book by ID
+
+- **URL:** `/api/books/{bookId}`
+- **Method:** `GET`
+- **Response:**
+
+  ```json
+  {
+    "title": "Malgudi Days",
+    "description": "A collection of short stories",
+    "price": 500,
+    "stock": 100,
+    "category": "Fiction",
+    "author": "R.K. Narayan",
+    "rating": 4.5
+  }
+  ```
+
+#### Create a Book
+
+- **URL:** `/api/books`
+- **Method:** `POST`
+- **Headers:**
+  - `x-auth-token`: `jwt_token`
+- **Request Body:**
+
+  ```json
+  {
+    "title": "Malgudi Days",
+    "description": "A collection of short stories",
+    "price": 500,
+    "stock": 100,
+    "category": "Fiction",
+    "author": "R.K. Narayan",
+    "rating": 4.5
+  }
+  ```
+
+- **Response:**
+
+  ```json
+  {
+    "newBook": {
+      "title": "Malgudi Days",
+      "description": "A collection of short stories",
+      "price": 500,
+      "stock": 100,
+      "category": "Fiction",
+      "author": "R.K. Narayan",
+      "rating": 4.5
+    }
+  }
+  ```
+
+#### Update a Book
+
+- **URL:** `/api/books/{bookId}`
+- **Method:** `PATCH`
+- **Headers:**
+  - `x-auth-token`: `jwt_token`
+- **Request Body:**
+
+  ```json
+  {
+    "price": 600
+  }
+  ```
+
+- **Response:**
+
+  ```json
+  {
+    "message": "Successfully updated the book"
+  }
+  ```
+
+#### Delete a Book
+
+- **URL:** `/api/books/{bookId}`
+- **Method:** `DELETE`
+- **Headers:**
+  - `x-auth-token`: `jwt_token`
+- **Response:**
+
+  ```json
+  {
+    "message": "Successfully deleted the book"
+  }
+  ```
+
+## Testing
+
+### Running Tests
+
+1. Install development dependencies:
+
+   ```bash
+   npm install --save-dev mocha chai chai-http
+   ```
+
+2. Run the tests:
+
+   ```bash
+   npm test
+   ```
+
+### Test Files
+
+- **User Tests:** `BookStore/test/user.js`
+- **Book Tests:** `BookStore/test/book.js`
+
+## License
+
+This project is licensed under the MIT License.

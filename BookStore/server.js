@@ -1,5 +1,6 @@
 const express = require("express");
 const connectDB = require("./config/db");
+const swaggerDocs = require("./config/swagger");
 const app = express();
 
 // Connection check with db
@@ -13,7 +14,7 @@ app.get("/", (req, res) => res.send("API running"));
 // Define Routes
 app.use("/api/users", require("./routes/api/users"));
 app.use("/api/books", require("./routes/api/books"));
-app.use("/api/purchases", require("./routes/api/purchases"));
+app.use("/", swaggerDocs);
 
 const PORT = process.env.PORT || 3000;
 

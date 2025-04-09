@@ -1,4 +1,3 @@
-// BookStore/routes/api/books.js
 const express = require("express");
 const router = express.Router();
 const Book = require("../../models/Book");
@@ -6,9 +5,95 @@ const { check, validationResult } = require("express-validator");
 const auth = require("../../middleware/auth");
 const User = require("../../models/User");
 
-// @route  GET api/books
-// @desc   Get all book list with optional filters and pagination
-// @access Public
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Book:
+ *       type: object
+ *       required:
+ *         - title
+ *         - price
+ *         - stock
+ *         - category
+ *         - author
+ *         - rating
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: The title of the book
+ *         description:
+ *           type: string
+ *           description: The description of the book
+ *         price:
+ *           type: number
+ *           description: The price of the book
+ *         stock:
+ *           type: number
+ *           description: The stock of the book
+ *         category:
+ *           type: string
+ *           description: The category of the book
+ *         author:
+ *           type: string
+ *           description: The author of the book
+ *         rating:
+ *           type: number
+ *           description: The rating of the book
+ *       example:
+ *         title: "Malgudi Days"
+ *         description: "A collection of short stories"
+ *         price: 500
+ *         stock: 100
+ *         category: "Fiction"
+ *         author: "R.K. Narayan"
+ *         rating: 4.5
+ */
+
+/**
+ * @swagger
+ * /api/books:
+ *   get:
+ *     summary: Get all books
+ *     tags: [Books]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Category of the book
+ *       - in: query
+ *         name: author
+ *         schema:
+ *           type: string
+ *         description: Author of the book
+ *       - in: query
+ *         name: rating
+ *         schema:
+ *           type: number
+ *         description: Minimum rating of the book
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of books per page
+ *     responses:
+ *       200:
+ *         description: The list of books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Book'
+ */
 router.get("/", async (req, res) => {
   try {
     const { category, author, rating, page = 1, limit = 10 } = req.query;
@@ -35,9 +120,29 @@ router.get("/", async (req, res) => {
   }
 });
 
-// @route  GET api/books/:bookId
-// @desc   Get a book
-// @access Public
+/**
+ * @swagger
+ * /api/books/{bookId}:
+ *   get:
+ *     summary: Get a book by ID
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: bookId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The book ID
+ *     responses:
+ *       200:
+ *         description: The book description by ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       400:
+ *         description: Book not found
+ */
 router.get("/:bookId", async (req, res) => {
   try {
     let bookId = req.params.bookId;
@@ -54,9 +159,32 @@ router.get("/:bookId", async (req, res) => {
   }
 });
 
-// @router  POST api/books
-// @desc    Create Book
-// @access  Private
+/**
+ * @swagger
+ * /api/books:
+ *   post:
+ *     summary: Create a new book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Book'
+ *     responses:
+ *       200:
+ *         description: The book was successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       401:
+ *         description: Unauthorized
+ *       400:
+ *         description: Book already exists
+ */
 router.post(
   "/",
   auth,
@@ -123,9 +251,35 @@ router.post(
   },
 );
 
-// @route  PATCH api/books/:bookId
-// @desc   Update a book
-// @access Private
+/**
+ * @swagger
+ * /api/books/{bookId}:
+ *   patch:
+ *     summary: Update a book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The book ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Book'
+ *     responses:
+ *       200:
+ *         description: The book was successfully updated
+ *       400:
+ *         description: Only admin can update books
+ *       500:
+ *         description: Server error
+ */
 router.patch("/:bookId", auth, async (req, res) => {
   try {
     let bookId = req.params.bookId;
@@ -153,9 +307,29 @@ router.patch("/:bookId", auth, async (req, res) => {
   }
 });
 
-// @route  DELETE api/books/:bookId
-// @desc   Delete a book
-// @access Private
+/**
+ * @swagger
+ * /api/books/{bookId}:
+ *   delete:
+ *     summary: Delete a book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The book ID
+ *     responses:
+ *       200:
+ *         description: The book was successfully deleted
+ *       400:
+ *         description: Only admin can delete books
+ *       500:
+ *         description: Server error
+ */
 router.delete("/:bookId", auth, async (req, res) => {
   try {
     let bookId = req.params.bookId;
