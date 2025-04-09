@@ -324,28 +324,32 @@ The API documentation is available at `http://localhost:3000/api-docs`.
 
 ### User Registration
 
-![User Registration](path/to/your/screenshot1.png)
+![User Registration](![image](https://github.com/user-attachments/assets/1ea5a76d-c681-46cc-bfe2-ecc04fdc1b30))
 
 ### User Login
 
-![User Login](path/to/your/screenshot2.png)
+![User Login](![image](https://github.com/user-attachments/assets/73ee55b4-2d82-410e-94c5-b97af81f48f1))
 
 ### Get All Books
 
-![Get All Books](path/to/your/screenshot3.png)
+![Get All Books](![image](https://github.com/user-attachments/assets/c7c83de0-dc02-4bbf-96c1-35d178bbcdc1))
+![image](https://github.com/user-attachments/assets/32e3973e-d4cb-4250-83bf-de82345159fd)
+
 
 ### Create a Book
 
-![Create a Book](path/to/your/screenshot4.png)
+![Create a Book](![image](https://github.com/user-attachments/assets/efaa7a19-755b-4f06-965c-12ef82c3885f))
 
 ### Update a Book
 
-![Update a Book](path/to/your/screenshot5.png)
+![Update a Book](![image](https://github.com/user-attachments/assets/dd2aa87c-37ec-4a63-bad5-9e3f5e7c41cc))
 
 ### Delete a Book
 
-![Delete a Book](path/to/your/screenshot6.png)
+![Delete a Book](![image](https://github.com/user-attachments/assets/dec04456-8fb6-412e-a599-246afb8beb7e))
 
+### Filters
+![Filters](![image](https://github.com/user-attachments/assets/f381c476-4c34-4035-b90a-a0453fc4a3b1))
 
 ## License
 
