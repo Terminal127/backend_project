@@ -6,8 +6,27 @@
 - [Features](#features)
 - [Technologies](#technologies)
 - [Setup Instructions](#setup-instructions)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+  - [Running the Server](#running-the-server)
+- [Docker Setup](#docker-setup)
+  - [Building the Docker Image](#building-the-docker-image)
+  - [Running the Docker Container](#running-the-docker-container)
 - [API Documentation](#api-documentation)
+  - [User Routes](#user-routes)
+    - [Register a User](#register-a-user)
+    - [Login a User](#login-a-user)
+  - [Book Routes](#book-routes)
+    - [Get All Books](#get-all-books)
+    - [Get a Book by ID](#get-a-book-by-id)
+    - [Create a Book](#create-a-book)
+    - [Update a Book](#update-a-book)
+    - [Delete a Book](#delete-a-book)
 - [Testing](#testing)
+  - [Running Tests](#running-tests)
+  - [Test Files](#test-files)
+- [Screenshots](#screenshots)
 - [License](#license)
 
 ## Description
@@ -19,6 +38,7 @@ BookStore API is a RESTful web service for managing books and users in a booksto
 - User registration and authentication
 - Role-based access control (admin and normal users)
 - CRUD operations for books
+- Purchase management
 - Swagger/OpenAPI documentation
 - Unit and integration tests
 
@@ -34,6 +54,7 @@ BookStore API is a RESTful web service for managing books and users in a booksto
 - Mocha
 - Chai
 - Chai-HTTP
+- Docker
 
 ## Setup Instructions
 
@@ -57,31 +78,52 @@ BookStore API is a RESTful web service for managing books and users in a booksto
    npm install
    ```
 
-3. Set up environment variables:
+### Environment Variables
 
-   Create a `default.json` file in the `config` directory with the following content:
+Create a `default.json` file in the `config` directory with the following content:
 
-   ```json
-   {
-     "mongoURI": "your_mongodb_connection_string",
-     "jwtSecret": "your_jwt_secret",
-     "admin-signup-key": "your_admin_signup_key"
-   }
-   ```
+```json
+{
+  "mongoURI": "your_mongodb_connection_string",
+  "jwtSecret": "your_jwt_secret",
+  "admin-signup-key": "your_admin_signup_key"
+}
+```
 
-4. Start the server:
+### Running the Server
+
+Start the server:
+
+```bash
+npm start
+```
+
+The server will start on `http://localhost:3000`.
+
+## Docker Setup
+
+### Building the Docker Image
+
+1. Ensure you have Docker installed on your machine.
+2. Build the Docker image:
 
    ```bash
-   npm start
+   docker build -t bookstore-api .
    ```
 
-   The server will start on `http://localhost:3000`.
+### Running the Docker Container
 
-### API Documentation
+1. Run the Docker container:
 
-The API documentation is available at `http://localhost:3000/api-docs`.
+   ```bash
+   docker run -p 3000:3000 -d bookstore-api
+   ```
+
+2. The server will start on `http://localhost:3000`.
 
 ## API Documentation
+
+The API documentation is available at `http://localhost:3000/api-docs`.
 
 ### User Routes
 
@@ -138,8 +180,11 @@ The API documentation is available at `http://localhost:3000/api-docs`.
   - `category` (optional)
   - `author` (optional)
   - `rating` (optional)
+  - `title` (optional, partial matches)
   - `page` (optional, default: 1)
   - `limit` (optional, default: 10)
+  - `sortBy` (optional, e.g., `price`)
+  - `order` (optional, `asc` or `desc`)
 
 - **Response:**
 
@@ -251,6 +296,9 @@ The API documentation is available at `http://localhost:3000/api-docs`.
   }
   ```
 
+
+
+
 ## Testing
 
 ### Running Tests
@@ -271,6 +319,33 @@ The API documentation is available at `http://localhost:3000/api-docs`.
 
 - **User Tests:** `BookStore/test/user.js`
 - **Book Tests:** `BookStore/test/book.js`
+
+## Screenshots
+
+### User Registration
+
+![User Registration](path/to/your/screenshot1.png)
+
+### User Login
+
+![User Login](path/to/your/screenshot2.png)
+
+### Get All Books
+
+![Get All Books](path/to/your/screenshot3.png)
+
+### Create a Book
+
+![Create a Book](path/to/your/screenshot4.png)
+
+### Update a Book
+
+![Update a Book](path/to/your/screenshot5.png)
+
+### Delete a Book
+
+![Delete a Book](path/to/your/screenshot6.png)
+
 
 ## License
 

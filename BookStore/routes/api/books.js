@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const Book = require("../../models/Book");
-const { check, validationResult } = require("express-validator");
+const { check } = require("express-validator");
 const auth = require("../../middleware/auth");
-const User = require("../../models/User");
+const BookController = require("../../controllers/book.controller");
 
 /**
  * @swagger
@@ -73,6 +72,11 @@ const User = require("../../models/User");
  *           type: number
  *         description: Minimum rating of the book
  *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         description: Title of the book (partial matches)
+ *       - in: query
  *         name: page
  *         schema:
  *           type: integer
@@ -84,6 +88,18 @@ const User = require("../../models/User");
  *           type: integer
  *           default: 10
  *         description: Number of books per page
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *         description: Field to sort by (e.g., title, price, rating)
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order (ascending or descending)
  *     responses:
  *       200:
  *         description: The list of books
@@ -94,31 +110,7 @@ const User = require("../../models/User");
  *               items:
  *                 $ref: '#/components/schemas/Book'
  */
-router.get("/", async (req, res) => {
-  try {
-    const { category, author, rating, page = 1, limit = 10 } = req.query;
-    let filter = { stock: { $gt: 0 } };
-
-    if (category) filter.category = category;
-    if (author) filter.author = author;
-    if (rating) filter.rating = { $gte: rating };
-
-    const books = await Book.find(filter)
-      .limit(parseInt(limit))
-      .skip((page - 1) * limit);
-
-    const totalBooks = await Book.countDocuments(filter);
-
-    res.status(200).json({
-      books,
-      totalPages: Math.ceil(totalBooks / limit),
-      currentPage: parseInt(page),
-    });
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+router.get("/", BookController.getAllBooks);
 
 /**
  * @swagger
@@ -143,21 +135,7 @@ router.get("/", async (req, res) => {
  *       400:
  *         description: Book not found
  */
-router.get("/:bookId", async (req, res) => {
-  try {
-    let bookId = req.params.bookId;
-    const book = await Book.findById(bookId);
-    if (!book) {
-      return res
-        .status(400)
-        .json({ errors: [{ message: "Could not find a book by this id" }] });
-    }
-    res.status(200).json(book);
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+router.get("/:bookId", BookController.getBookById);
 
 /**
  * @swagger
@@ -204,51 +182,7 @@ router.post(
       max: 5,
     }),
   ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(401).json({ errors: errors.array() });
-    }
-
-    const { title, description, price, stock, category, author, rating } =
-      req.body;
-
-    try {
-      let book = await Book.findOne({ title });
-
-      if (book) {
-        return res
-          .status(400)
-          .json({ errors: [{ message: "Book already exists" }] });
-      }
-
-      const isAdmin = await User.findById(req.user.id).select("-password");
-
-      if (isAdmin.role === 0) {
-        return res
-          .status(400)
-          .json({ errors: [{ message: "Only admin can add books" }] });
-      }
-
-      newBook = new Book({
-        title,
-        description: description ? description : null,
-        price,
-        stock,
-        category,
-        author,
-        rating,
-      });
-      await newBook.save();
-
-      res.status(200).json({
-        newBook,
-      });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server error");
-    }
-  },
+  BookController.createBook,
 );
 
 /**
@@ -280,32 +214,7 @@ router.post(
  *       500:
  *         description: Server error
  */
-router.patch("/:bookId", auth, async (req, res) => {
-  try {
-    let bookId = req.params.bookId;
-    const book = await Book.findById(bookId).select("-stock");
-    if (!book) {
-      return res
-        .status(400)
-        .json({ errors: [{ message: "Could not find a book by this id" }] });
-    }
-
-    const isAdmin = await User.findById(req.user.id).select("-password");
-
-    if (isAdmin.role === 0) {
-      return res
-        .status(400)
-        .json({ errors: [{ message: "Only admin can add books" }] });
-    }
-    const updateOptions = req.body;
-    await book.updateOne({ $set: updateOptions });
-
-    res.status(200).json({ message: "Successfully updated the book" });
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+router.patch("/:bookId", auth, BookController.updateBook);
 
 /**
  * @swagger
@@ -330,31 +239,6 @@ router.patch("/:bookId", auth, async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.delete("/:bookId", auth, async (req, res) => {
-  try {
-    let bookId = req.params.bookId;
-    const book = await Book.findById(bookId).select("-stock");
-    if (!book) {
-      return res
-        .status(400)
-        .json({ errors: [{ message: "Could not find a book by this id" }] });
-    }
-
-    const isAdmin = await User.findById(req.user.id).select("-password");
-
-    if (isAdmin.role === 0) {
-      return res
-        .status(400)
-        .json({ errors: [{ message: "Only admin can delete a books" }] });
-    }
-
-    await book.deleteOne();
-
-    res.status(200).json({ message: "Successfully deleted the book" });
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+router.delete("/:bookId", auth, BookController.deleteBook);
 
 module.exports = router;
